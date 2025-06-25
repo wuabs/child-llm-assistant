@@ -1,0 +1,12 @@
+[project]
+name = "child-llm-assistant"
+version = "0.1.0"
+description = "LLM-based assistant for children combining psychology and tutoring"
+authors = ["Your Name <you@example.com>"]
+
+[tool.setuptools]
+packages = ["training", "agents", "api", "frontend", "utils", "rag_system"]
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"

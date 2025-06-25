@@ -1,0 +1,8 @@
+transformers
+accelerate
+peft
+langchain
+fastapi
+gradio
+uvicorn
+faiss-cpu
