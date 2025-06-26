@@ -15,3 +15,10 @@
 git clone https://github.com/your-name/child-llm-assistant.git
 cd child-llm-assistant
 pip install -r requirements.txt
+uvicorn app_fastapi:app --reload
+POST http://localhost:8000/chat
+{
+  "message": "Почему я не понимаю дроби?",
+  "history": []
+}
+
