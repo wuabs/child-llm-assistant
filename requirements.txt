@@ -8,3 +8,4 @@ uvicorn
 faiss-cpu
 torch
 tf-keras
+openai
