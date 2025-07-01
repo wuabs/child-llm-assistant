@@ -1,11 +1,11 @@
 import os
 import json
 import random
-import openai
+from openai import OpenAI
 from friend_agent import build_prompt
 
-# 🔑 Установи свой ключ через переменные окружения или напрямую
-openai.api_key = os.getenv("OPENAI_API_KEY") or "sk-..."  # вставь сюда свой ключ
+# 🔐 Подключение к OpenAI
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY") or "sk-...")  # вставь свой ключ
 
 # 💬 Настройки фраз ребёнка
 ages = [7, 9, 11, 13, 15]
@@ -19,19 +19,23 @@ expression_styles = {
 }
 
 def chat(prompt, system="Ты — ребёнок, говорящий о своих переживаниях.", max_tokens=100):
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": system},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.9,
-        max_tokens=max_tokens,
-        top_p=0.95,
-        frequency_penalty=0.1,
-        presence_penalty=0.1
-    )
-    return response.choices[0].message["content"].strip()
+    try:
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.9,
+            max_tokens=max_tokens,
+            top_p=0.95,
+            frequency_penalty=0.1,
+            presence_penalty=0.1
+        )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        print(f"[OpenAI Error]: {e}")
+        return None
 
 def generate_child_phrase():
     age = random.choice(ages)
@@ -44,45 +48,42 @@ def generate_child_phrase():
         f"в которой ты делишься своими переживаниями на тему «{theme}» {style}."
     )
 
-    try:
-        phrase = chat(prompt)
-        return {
-            "text": phrase,
-            "age": age,
-            "theme": theme,
-            "style": style_key
-        }
-
-    except Exception as e:
-        print(f"[Ошибка генерации фразы ребёнка]: {e}")
+    phrase = chat(prompt)
+    if not phrase:
         return None
+
+    return {
+        "text": phrase,
+        "age": age,
+        "theme": theme,
+        "style": style_key
+    }
 
 def generate_dialogs(n=30, output_path='data/child_dialogs.jsonl'):
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, 'w', encoding='utf-8') as f:
         for i in range(n):
             child = generate_child_phrase()
-            if not child: continue
+            if not child:
+                continue
 
             prompt = build_prompt(child['text'])
+            reply = chat(prompt, system="Ты — заботливый, эмпатичный друг, который поддерживает ребёнка.", max_tokens=120)
+            if not reply:
+                continue
 
-            try:
-                reply = chat(prompt, system="Ты — заботливый, поддерживающий друг, который отвечает на русском ребёнку.")
-                f.write(json.dumps({
-                    "child_input": child['text'],
-                    "child_meta": {
-                        "age": child['age'],
-                        "theme": child['theme'],
-                        "style": child['style']
-                    },
-                    "friend_reply": reply
-                }, ensure_ascii=False) + '\n')
+            f.write(json.dumps({
+                "child_input": child['text'],
+                "child_meta": {
+                    "age": child['age'],
+                    "theme": child['theme'],
+                    "style": child['style']
+                },
+                "friend_reply": reply
+            }, ensure_ascii=False) + '\n')
 
-                print(f"[{i+1}/{n}] ✅")
+            print(f"[{i+1}/{n}] ✅")
 
-            except Exception as e:
-                print(f"[Ошибка генерации ответа друга]: {e}")
-
-# Пример запуска
+# 🔽 Пример запуска
 if __name__ == "__main__":
     generate_dialogs(n=10)
