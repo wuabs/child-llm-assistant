@@ -30,7 +30,7 @@ def classify_strategy(child_input):
 # Генерация промпта
 def build_prompt(child_input):
     strategy = classify_strategy(child_input)
-    prompt = f\"""Ты — добрый и внимательный друг ребёнка. Ребёнок говорит: "{child_input}"
+    prompt = f"""Ты — добрый и внимательный друг ребёнка. Ребёнок говорит: "{child_input}"
 
     Ответь с поддержкой, используя стратегию: {strategy}.
 

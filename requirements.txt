@@ -6,3 +6,5 @@ fastapi
 gradio
 uvicorn
 faiss-cpu
+torch
+tf-keras
