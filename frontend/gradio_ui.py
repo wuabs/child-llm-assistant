@@ -4,31 +4,31 @@ from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 from langchain.llms import HuggingFacePipeline
 from rag_system.rag_chain import get_rag_chain
 
-# === Путь к модели
-MODEL_PATH = "path/to/your/final-model"
+# Путь к модели
+MODEL_PATH = "models/lora-instruct"
 EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 VECTORSTORE_PATH = "vectorstore/index"
 
-# === Загрузка модели и токенизатора
+# Загрузка модели и токенизатора
 tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
 model = AutoModelForCausalLM.from_pretrained(MODEL_PATH)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.to(device)
 
-# === HuggingFace LLM → LangChain wrapper
+# HuggingFace LLM → LangChain wrapper
 pipe = pipeline("text-generation", model=model, tokenizer=tokenizer, device=0 if torch.cuda.is_available() else -1)
 llm = HuggingFacePipeline(pipeline=pipe)
 
-# === Подключение RAG-цепочки
+# Подключение RAG-цепочки
 rag_chain = get_rag_chain(llm, VECTORSTORE_PATH)
 
-# === Системный промпт
+# Системный промпт
 SYSTEM_PROMPT = (
     "Ты — добрый и понимающий друг, который хорошо разбирается в детской психологии. "
     "Если ребёнок делится чувствами — поддержи. Если просит объяснить учебу — помоги понятным примером."
 )
 
-# === Ключевые слова для определения запроса на учёбу
+# Ключевые слова для определения запроса на учёбу
 study_keywords = [
     "помоги", "объясни", "задача", "что такое", "как найти", "пример",
     "математика", "история", "наука", "физика", "биология", "глагол", "домашка"
@@ -37,7 +37,7 @@ study_keywords = [
 def is_study_query(text):
     return any(kw in text.lower() for kw in study_keywords)
 
-# === Генерация ответа
+# Генерация ответа
 def generate_reply(message, history):
     # Собираем диалог
     full_dialog = SYSTEM_PROMPT + "\n"
@@ -62,7 +62,7 @@ def generate_reply(message, history):
     reply = decoded[len(full_dialog):].strip().split("\n")[0]
     return reply
 
-# === Gradio чат
+# Gradio чат
 chatbot = gr.ChatInterface(
     fn=generate_reply,
     title="🤖 Помощник-друг",

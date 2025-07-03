@@ -5,5 +5,10 @@ __pycache__/
 *.pt
 *.bin
 *.log
-data/texts/
+data/cleaned_texts/*
+data/texts/*
+data/textbooks/*
+data/*.txt
 data/*.jsonl
+models/*
+vectorstore/*

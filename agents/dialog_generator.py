@@ -4,10 +4,10 @@ import random
 from openai import OpenAI
 from friend_agent import build_prompt
 
-# 🔐 Подключение к OpenAI
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY") or "sk-...")  # вставь свой ключ
+# Подключение к OpenAI
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))  
 
-# 💬 Настройки фраз ребёнка
+# Настройки фраз ребёнка
 ages = [7, 9, 11, 13, 15]
 themes = ["друзья", "учёба", "родители", "самооценка", "будущее", "одиночество"]
 expression_styles = {
@@ -84,6 +84,6 @@ def generate_dialogs(n=30, output_path='data/child_dialogs.jsonl'):
 
             print(f"[{i+1}/{n}] ✅")
 
-# 🔽 Пример запуска
+# Пример запуска
 if __name__ == "__main__":
     generate_dialogs(n=10)
